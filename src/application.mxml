@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" backgroundColor="white" layout="absolute" xmlns:containers="org.osmf.containers.*" applicationComplete="init();" xmlns:media="org.osmf.media.*">
+ 
+ 
+ 
+    <mx:Script>
+        <![CDATA[
+            import flash.display.Graphics;
+            import flash.display.Sprite;
+            import org.osmf.display.MediaPlayerSprite;
+            import org.osmf.layout.LayoutUtils;
+            import org.osmf.containers.MediaContainer;
+            import org.osmf.media.MediaElement;
+            import org.osmf.media.MediaPlayer;
+            import org.osmf.media.URLResource;
+            import org.osmf.utils.URL;
+            import org.osmf.video.VideoElement;
+            import org.osmf.net.NetLoader;
+
+            import mx.core.UIComponent;
+            
+            // Debugger http://demonsterdebugger.com/
+            import  nl.demonsters.debugger.MonsterDebugger;
+ 
+            private static const REMOTE_PROGRESSIVE:String = "http://yeti-media.com/flv/video-w50s.flv";
+ 
+            private var mediaElement:MediaElement;
+            private var mediaPlayer:MediaPlayer;
+            private var container:MediaContainer;
+ 
+            private function init():void
+            {
+                // set up some listeners for our buttons
+                playBtn.addEventListener( MouseEvent.CLICK, playHandler, false, 0, true );
+                pauseBtn.addEventListener( MouseEvent.CLICK, pauseHandler, false, 0, true );
+                seekBtn.addEventListener( MouseEvent.CLICK, seekHandler, false, 0, true );
+ 
+                // First create a MediaElement and load some media 
+                mediaElement = new VideoElement( new NetLoader, new URLResource( new URL( REMOTE_PROGRESSIVE ) ) );
+ 
+                // We need a DisplayObject for the video
+                container = new MediaContainer(); 
+                // feed the display object a media element
+                container.addMediaElement( mediaElement ); 
+                // Flex requires a DisplayObject to be wrapped in Flex Framework UI Abstraction
+                videoParent.addChild( container ); 
+ 
+                // MediaPlayer is a virtual controller. Assign it a media element and it will autoplay the media by default.
+                mediaPlayer = new MediaPlayer( mediaElement );
+ 
+                // We will manually resize the MediaContainer just for kicks
+                LayoutUtils.setAbsoluteLayout( mediaElement.metadata, 640, 360 ); 
+            }
+ 
+            private function playHandler( e:MouseEvent ):void
+            {
+                if ( !mediaPlayer.playing )
+                {
+                    mediaPlayer.play();
+                }
+            }
+ 
+            private function pauseHandler( e:MouseEvent ):void
+            {
+                if ( mediaPlayer.playing )
+                {
+                    mediaPlayer.pause();
+                }
+            }
+ 
+            private function seekHandler( e:MouseEvent ):void
+            {
+                var val:Number =  parseFloat( timeTxt.text );
+ 
+                mediaPlayer.seek( val );
+            }
+        ]]>
+    </mx:Script>
+    
+    <mx:VideoDisplay id="videoParent"/>
+    <mx:Button x="10" y="400" label="play" id="playBtn"/>
+    <mx:Button x="72" y="400" label="pause" id="pauseBtn"/>
+    <mx:Button x="145" y="400" label="seek" id="seekBtn"/>
+    <mx:TextInput x="211" y="400" width="40" id="timeTxt" text="0" restrict="0-9"/>
+    
+</mx:Application>
